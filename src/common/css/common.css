@@ -26,6 +26,10 @@ body {
   min-height: 100vh;
 }
 
+section {
+  min-height: 94vh;
+}
+
 footer {
   background-color: var(--sky-yellow-4);
   color: var(--sky-black);
@@ -176,12 +180,18 @@ input {
 
 /* 画面個別 -------------------------------------------------------------------------*/
 /* Content */
-.sky-Content-preview {
+.sky-Content-preview,
+.sky-Content-delete {
   display: flex;
   flex-direction: column;
+  margin-left: 1.5rem;
 }
-.sky-Content-preview-item {
+.sky-Content-preview-item,
+.sky-Content-delete-item {
   margin-top: auto;
+}
+.sky-Content-delete-item {
+  width: 45px;
 }
 .sky-Content-publish {
   align-items: center;
@@ -308,9 +318,12 @@ input {
   .sky-Content-publish {
     margin-bottom: 1rem !important;
     margin-top: 1rem !important;
+    flex: 1; /* 幅を自動的に調整 */
   }
-  .sky-Content-preview {
+  .sky-Content-preview,
+  .sky-Content-delete {
     margin-bottom: 0.5rem;
+    margin-left: 1rem;
   }
 }
 /*tablet 768px以上1024px以下 */
@@ -338,8 +351,11 @@ input {
     margin-left: 0.2rem !important;
     padding-top: 1.7rem !important;
   }
+  .sky-control-publish-input {
+    margin-right: 1rem;
+  }
 }
-/*PC 768px以上 */
+/*PC 1024px以上 */
 @media screen and (min-width: 1024px) {
   .sky-section,
   .sky-footer,
@@ -363,5 +379,8 @@ input {
   .sky-Content-publish {
     margin-left: 0.2rem !important;
     padding-top: 1.7rem !important;
+  }
+  .sky-control-publish-input {
+    margin-right: 1rem;
   }
 }

@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import previewImg from "../common/image/preview.svg";
 import elementAddImg from "../common/image/plus-lg.svg";
 import elementDelImg from "../common/image/trash.svg";
+import deleteImg from "../common/image/trash.svg";
 
-interface ContentData {
+export interface ContentData {
   screenName: string;
   schedule_published: string;
   schedule_unpublished: string;
@@ -19,13 +20,13 @@ interface ContentData {
   }>;
 }
 
-interface eleResultData {
+export interface eleResultData {
   id: string;
   title: string;
   code: string;
 }
 
-interface ElementListData {
+export interface ElementListData {
   pagerOutput: "";
   results: Array<{
     id: string;
@@ -345,6 +346,16 @@ export const Content = () => {
     }
   }
 
+  const doDelete = () => {
+    const deleteform = document.forms.namedItem("deleteform") as HTMLFormElement;
+    if (deleteform) {
+      deleteform.submit();
+    } else {
+      console.error("Form with name 'contentform' not found");
+      return;
+    }
+  };
+
   return (
     <>
       <div className="flex-grow-1 d-flex justify-content-center align-items-center p-4 sky-content">
@@ -358,35 +369,52 @@ export const Content = () => {
                   <>
                     <div className="sky-control mb-2">
                       <div className="sky-control-publish">
-                        <div className="me-2">
+                        <div className="sky-control-publish-input">
                           <label htmlFor="schedule_published" className="sky-form-label fw-bold ms-1 mb-1">
                             start
                           </label>
                           <input type="text" className="form-control border-warning sky-input datepicker" id="schedule_published" name="schedule_published" value={schedule_published} onChange={(e) => setSchedule_published(e.target.value)} placeholder="Enter start" required />
                         </div>
-                        <div className="me-2">
+                        <div className="sky-control-publish-input">
                           <label htmlFor="schedule_unpublished" className="sky-form-label fw-bold ms-1 mb-1">
                             end
                           </label>
                           <input type="text" className="form-control border-warning sky-input datepicker" id="schedule_unpublished" name="schedule_unpublished" value={schedule_unpublished} onChange={(e) => setSchedule_unpublished(e.target.value)} placeholder="Enter end" required />
                         </div>
+                      </div>
+                      <div className="d-flex justify-content-center">
+                        {/* publish */}
                         <div className="form-check form-switch sky-Content-publish">
                           <input className="form-check-input sky-input-switch" type="checkbox" role="switch" id="published" name="published" value="1" onChange={publishedCheckbox} checked />
-                          <label className="form-check-label ms-1" htmlFor="published">
+                          <label className="form-check-label ms-1 pt-1" htmlFor="published">
                             publish
                           </label>
                         </div>
-                      </div>
-                      <div className="sky-Content-preview">
-                        <a className="btn btn-warning w-100 sky-Content-preview-item" id="preview-bputton" onClick={preview}>
-                          <span>preview</span>
-                          <img src={previewImg} alt="preview" />
-                        </a>
+                        {/* preview */}
+                        <div className="sky-Content-preview">
+                          <a className="btn btn-warning sky-Content-preview-item" id="preview-button" onClick={preview}>
+                            <img src={previewImg} alt="preview" />
+                          </a>
+                        </div>
+                        {/* delete */}
+                        <div className="sky-Content-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                          <a className="btn btn-warning sky-Content-delete-item">
+                            <img src={deleteImg} alt="delete" />
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <input type="hidden" id="published" name="published" value="1" />
+                  <>
+                    {/* delete */}
+                    <div className="sky-Content-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                      <a className="btn btn-warning sky-Content-delete-item ms-auto">
+                        <img src={deleteImg} alt="delete" />
+                      </a>
+                    </div>
+                    <input type="hidden" id="published" name="published" value="1" />
+                  </>
                 )}
 
                 {/* template select */}
@@ -519,78 +547,103 @@ export const Content = () => {
                 </button>
                 <input type="hidden" name="id" value={id} />
                 <input type="hidden" name="type" value={mode} />
+              </form>
 
-                {/* submit modal */}
-                <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
+              {/* submit modal */}
+              <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title" id="exampleModalLabel">
+                        登録しますか？
+                      </h5>
+                    </div>
+                    <div className="modal-footer">
+                      <button type="button" className="btn me-2" data-bs-dismiss="modal">
+                        キャンセル
+                      </button>
+                      {mode == "template" ? (
+                        <button type="button" className="btn btn-warning px-4" onClick={doSubmitTemp}>
+                          登録
+                        </button>
+                      ) : (
+                        <button type="button" className="btn btn-warning px-4" onClick={doSubmit}>
+                          登録
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* element Select modal */}
+              {mode == "template" && (
+                <div className="modal fade" id="element-selectModal" tabIndex={-1} aria-labelledby="element-selectModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
                   <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
-                      <div className="modal-header">
-                        <h5 className="modal-title" id="exampleModalLabel">
-                          登録しますか？
-                        </h5>
-                      </div>
-                      <div className="modal-footer">
-                        <button type="button" className="btn me-2" data-bs-dismiss="modal">
+                      <div className="modal-header">Element Select</div>
+                      <section className="sky-list-container">
+                        {list.results.map((result: any, index: any) => (
+                          <>
+                            <a
+                              href="#"
+                              onClick={() => {
+                                elementSelect(index);
+                              }}
+                              key={index}
+                            >
+                              <div className={`sky-list-card entry element-${index}`} style={{ backgroundColor: "elementcolor" }}>
+                                <p className="mb-0">ID: {result.id}</p>
+                                <h5 className="mb-1">{result.title}</h5>
+                              </div>
+                            </a>
+                            <input type="hidden" id={`element-${index}-id`} value={result.id} />
+                            <input type="hidden" id={`element-${index}-title`} value={result.title} />
+                            <input type="hidden" id={`element-${index}-code`} value={result.elementcolor} />
+                          </>
+                        ))}
+                        <input type="hidden" id="selected-index" value="" />
+                        <input type="hidden" id="selected-value" value="" />
+                        <nav aria-label="Page navigation example">
+                          <ul className="pagination justify-content-center align-items-center mt-5" dangerouslySetInnerHTML={{ __html: list.pagerOutput }}></ul>
+                        </nav>
+                      </section>
+                      <div className="modal-footer d-flex justify-content-center align-items-center">
+                        <button type="button" className="btn mx-5" data-bs-dismiss="modal">
                           キャンセル
                         </button>
-                        {mode == "template" ? (
-                          <button type="button" className="btn btn-warning px-4" onClick={doSubmitTemp}>
-                            登録
-                          </button>
-                        ) : (
-                          <button type="button" className="btn btn-warning px-4" onClick={doSubmit}>
-                            登録
-                          </button>
-                        )}
+                        <button type="button" className="btn btn-warning px-4 mx-5" data-bs-dismiss="modal" onClick={elementSelecedComp}>
+                          選択
+                        </button>
                       </div>
                     </div>
                   </div>
                 </div>
+              )}
 
-                {/* element Select modal */}
-                {mode == "template" && (
-                  <div className="modal fade" id="element-selectModal" tabIndex={-1} aria-labelledby="element-selectModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-                    <div className="modal-dialog modal-dialog-centered">
-                      <div className="modal-content">
-                        <div className="modal-header">Element Select</div>
-                        <section className="sky-list-container">
-                          {list.results.map((result: any, index: any) => (
-                            <>
-                              <a
-                                href="#"
-                                onClick={() => {
-                                  elementSelect(index);
-                                }}
-                                key={index}
-                              >
-                                <div className={`sky-list-card entry element-${index}`} style={{ backgroundColor: "elementcolor" }}>
-                                  <p className="mb-0">ID: {result.id}</p>
-                                  <h5 className="mb-1">{result.title}</h5>
-                                </div>
-                              </a>
-                              <input type="hidden" id={`element-${index}-id`} value={result.id} />
-                              <input type="hidden" id={`element-${index}-title`} value={result.title} />
-                              <input type="hidden" id={`element-${index}-code`} value={result.elementcolor} />
-                            </>
-                          ))}
-                          <input type="hidden" id="selected-index" value="" />
-                          <input type="hidden" id="selected-value" value="" />
-                          <nav aria-label="Page navigation example">
-                            <ul className="pagination justify-content-center align-items-center mt-5" dangerouslySetInnerHTML={{ __html: list.pagerOutput }}></ul>
-                          </nav>
-                        </section>
-                        <div className="modal-footer d-flex justify-content-center align-items-center">
-                          <button type="button" className="btn mx-5" data-bs-dismiss="modal">
-                            キャンセル
-                          </button>
-                          <button type="button" className="btn btn-warning px-4 mx-5" data-bs-dismiss="modal" onClick={elementSelecedComp}>
-                            選択
-                          </button>
-                        </div>
-                      </div>
+              {/* delete modal */}
+              <div className="modal fade" id="deleteModal" tabIndex={-1} aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title" id="deleteModalLabel">
+                        削除しますか？元には戻せません
+                      </h5>
+                    </div>
+                    <div className="modal-footer">
+                      <button type="button" className="btn me-2" data-bs-dismiss="modal">
+                        キャンセル
+                      </button>
+                      <button type="button" className="btn btn-warning px-4" onClick={doDelete}>
+                        削除
+                      </button>
                     </div>
                   </div>
-                )}
+                </div>
+              </div>
+              <form id="deleteform" name="deleteform" action="http://localhost:8080/webadmin/delete_post" method="POST">
+                <input type="hidden" name="id" id="deleteId" value={id} />
+                <input type="hidden" name="mode" value={mode} />
               </form>
             </div>
           </div>
