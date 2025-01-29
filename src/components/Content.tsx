@@ -62,7 +62,7 @@ export const Content = () => {
   const [id, setId] = useState("");
   const [mode, setMode] = useState("");
   let elementcolor = "";
-  let templateOutput = "";
+  const [templateOutput, setTemplateOutput] = useState("");
   let colorOutput = "";
   const [eleResults, setEleResults] = useState<eleResultData[]>([]);
   const [result, setResult] = useState<ContentData>({
@@ -129,12 +129,24 @@ export const Content = () => {
           setUrl(data.url || "");
           setId(fetchId || "");
           elementcolor = data.elementcolor || "";
-          templateOutput = data.templateOutput || "";
+          setTemplateOutput(data.templateOutput || "");
           colorOutput = data.colorOutput || "";
           setEleResults(data.eleResults || [{ id: "", title: "", code: "" }]);
           if (fetchmode == "template") {
             createElementItems();
           }
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    } else {
+      fetch("http://localhost:8080/webadmin/gettemplate", {
+        method: "GET",
+      })
+        .then((res) => res.text())
+        .then((data) => {
+          // console.log(data);
+          setTemplateOutput(data || "");
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
