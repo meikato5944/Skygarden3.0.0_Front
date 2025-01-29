@@ -72,7 +72,7 @@ export const Header = () => {
               </a>
             </li>
             <li className="nav-item ms-3">
-              <a className="nav-link" href="/webadmin/login/logout.jsp">
+              <a className="nav-link" href="http://localhost:8080/webadmin/logout">
                 Logout
               </a>
             </li>
@@ -149,17 +149,17 @@ export const Header = () => {
               </ul>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/webadmin/userList.jsp">
+              <a className="nav-link" href="/user-list">
                 Users
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/webadmin/setting.jsp">
+              <a className="nav-link" href="/setting">
                 Settings
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/webadmin/login/logout.jsp">
+              <a className="nav-link" href="http://localhost:8080/webadmin/logout">
                 Logout
               </a>
             </li>

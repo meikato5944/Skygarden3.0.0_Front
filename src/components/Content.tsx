@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import previewImg from "../common/image/preview.svg";
 import elementAddImg from "../common/image/plus-lg.svg";
+import elementDelImg from "../common/image/trash.svg";
 
 interface ContentData {
   screenName: string;
@@ -14,10 +15,40 @@ interface ContentData {
   templateOutput: string;
   colorOutput: string;
   eleResults: Array<{
-    id: string;
-    title: string;
-    code: string;
+    elementResult: eleResultData;
   }>;
+}
+
+interface eleResultData {
+  id: string;
+  title: string;
+  code: string;
+}
+
+interface ElementListData {
+  pagerOutput: "";
+  results: Array<{
+    id: string;
+    created: string;
+    updated: string;
+    created_by: string;
+    updated_by: string;
+    schedule_published: string;
+    schedule_unpublished: string;
+    title: string;
+    content: string;
+    head: string;
+    url: string;
+    type: string;
+    elementcolor: string;
+    template: string;
+  }>;
+}
+
+interface ElementItemType {
+  id: string;
+  title: string;
+  code: string;
 }
 
 export const Content = () => {
@@ -28,18 +59,12 @@ export const Content = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [url, setUrl] = useState("");
+  const [id, setId] = useState("");
   const [mode, setMode] = useState("");
   let elementcolor = "";
   let templateOutput = "";
   let colorOutput = "";
-  let eleResults = [
-    {
-      id: "",
-      title: "",
-      code: "",
-    },
-  ];
-
+  const [eleResults, setEleResults] = useState<eleResultData[]>([]);
   const [result, setResult] = useState<ContentData>({
     screenName: "",
     schedule_published: "",
@@ -51,21 +76,42 @@ export const Content = () => {
     elementcolor: "",
     templateOutput: "",
     colorOutput: "",
-    eleResults: [
+    eleResults: [],
+  });
+  const elementItems = useRef<eleResultData[]>([]); // useRefを使用して値を保持
+
+  //elementSelect
+  let elementAddIndex = useRef(0);
+  const [list, setList] = useState<ElementListData>({
+    pagerOutput: "",
+    results: [
       {
         id: "",
+        created: "",
+        updated: "",
+        created_by: "",
+        updated_by: "",
+        schedule_published: "",
+        schedule_unpublished: "",
         title: "",
-        code: "",
+        content: "",
+        head: "",
+        url: "",
+        type: "",
+        elementcolor: "",
+        template: "",
       },
     ],
   });
 
-  useEffect(() => {
+  //値取得
+  useLayoutEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setMode(params.get("mode") || "");
-    const id = params.get("id") || "";
-    if (id != "") {
-      fetch("http://localhost:8080/webadmin/getcontent?mode=" + mode + "&id=" + id, {
+    let fetchId = params.get("id") || "";
+    let fetchmode = params.get("mode") || "";
+    if (fetchId != "") {
+      fetch("http://localhost:8080/webadmin/getcontent?mode=" + fetchmode + "&id=" + fetchId, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -81,10 +127,14 @@ export const Content = () => {
           setTitle(data.title || "");
           setContent(data.content || "");
           setUrl(data.url || "");
+          setId(fetchId || "");
           elementcolor = data.elementcolor || "";
           templateOutput = data.templateOutput || "";
           colorOutput = data.colorOutput || "";
-          eleResults = data.eleResults || [{ id: "", title: "", code: "" }];
+          setEleResults(data.eleResults || [{ id: "", title: "", code: "" }]);
+          if (fetchmode == "template") {
+            createElementItems();
+          }
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -92,9 +142,7 @@ export const Content = () => {
     }
   }, []);
 
-  const publishedCheckbox = () => {
-    // console.log("Checkbox toggled");
-  };
+  const publishedCheckbox = () => {};
 
   const preview = () => {
     const preview = document.getElementById("contentform") as HTMLFormElement;
@@ -108,8 +156,13 @@ export const Content = () => {
   };
 
   function colorchange() {
-    // var color = $(".element-color-option").val();
-    // $(".element-color-option").css("background-color", color);
+    let color = $(".element-color-option").val();
+    if (Array.isArray(color)) {
+      color = color[0];
+    }
+    if (color !== undefined) {
+      $(".element-color-option").css("background-color", color);
+    }
   }
 
   const doSubmit = () => {
@@ -122,146 +175,161 @@ export const Content = () => {
     }
   };
 
-  var elementItems: Array<{ id: string; title: string; code: string }> = [];
-  createElementItems();
-
+  // Template------------------------------------------------------------------------------------------------
   //一覧から配列作成
   function createElementItems() {
-    var elements = document.getElementsByName("element-content");
-    elementItems = []; //初期化
-    for (var i = 0; i < elements.length; i++) {
-      var element = elements[i];
-      var elementItem: { id: string; title: string; code: string } = { id: "", title: "", code: "" };
-      const inputElement = element.children[6] as HTMLInputElement;
-      if (inputElement.value === "1") {
-        elementItem.id = "content";
-        elementItem.title = "";
-        elementItem.code = "";
-      } else {
-        elementItem.id = (element.children[3] as HTMLInputElement).value;
-        elementItem.title = (element.children[4] as HTMLInputElement).value;
-        elementItem.code = (element.children[5] as HTMLInputElement).value;
-      }
-      elementItems.push(elementItem);
+    const elements = Array.from(document.querySelectorAll('[data-name="element-content"]'));
+    elementItems.current = []; //初期化
+    for (let i = 0; i < elements.length; i++) {
+      let element = elements[i];
+      let elementItem: eleResultData = { id: "", title: "", code: "" };
+      let elementId = element.getAttribute("data-element-id");
+      let idStr = "";
+      elementId == "content" || elementId == "" ? (idStr = "content") : (idStr = elementId || "");
+      elementItem["id"] = idStr;
+      elementItem["title"] = element.getAttribute("data-element-title") || "";
+      elementItem["code"] = element.getAttribute("data-element-code") || "";
+      elementItems.current.push(elementItem);
     }
   }
 
   //配列を一覧に反映
   function reElements() {
-    var elements = document.getElementsByName("element-content");
-    for (var i = 0; i < elementItems.length; i++) {
-      var element = elements[i];
-      if (elementItems[i]["id"] == "content") {
-        var id = elementItems[i]["id"];
-        var title = elementItems[i]["title"];
-        var code = elementItems[i]["code"];
-        element.id = "element-" + (i + 1);
-        element.children[1].id = "element-" + (i + 1) + "-title";
-        element.style.backgroundColor = "#dc143c";
-        element.children[0].children[0].children[0].setAttribute("onclick", "upButton(" + (i + 1) + ")");
-        element.children[0].children[1].children[0].setAttribute("onclick", "downButton(" + (i + 1) + ")");
-        element.children[2].children[0].setAttribute("onclick", "");
+    const elements = Array.from(document.querySelectorAll('[data-name="element-content"]'));
+    for (let i = 0; i < elementItems.current.length; i++) {
+      let element = elements[i] as HTMLFormElement;
+      if (elementItems.current[i]["id"] === "" || elementItems.current[i]["id"] === "content") {
+        let title = elementItems.current[i]["title"];
+        let code = elementItems.current[i]["code"];
+        element.id = "element-" + i;
+        element.setAttribute("data-element-id", "content");
+        element.setAttribute("data-element-title", title);
+        element.setAttribute("data-element-code", code);
+        element.style.backgroundColor = "#fff888";
         element.children[1].innerHTML = "コンテンツ部分";
-        (element.children[3] as HTMLInputElement).value = id;
-        element.children[3].id = "element-" + (i + 1) + "-id";
-        (element.children[4] as HTMLInputElement).value = title;
-        (element.children[4] as HTMLInputElement).id = "element-" + (i + 1) + "-title";
-        (element.children[5] as HTMLInputElement).value = code;
-        (element.children[5] as HTMLInputElement).id = "element-" + (i + 1) + "-code";
-        (element.children[6] as HTMLInputElement).value = "1";
-        (element.children[6] as HTMLInputElement).id = "element-" + (i + 1) + "-content";
       } else {
-        var id = elementItems[i]["id"];
-        var title = elementItems[i]["title"];
-        var code = elementItems[i]["code"];
-        element.id = "element-" + (i + 1);
-        element.children[1].id = "element-" + (i + 1) + "-title";
+        let elementId = elementItems.current[i]["id"];
+        let title = elementItems.current[i]["title"];
+        let code = elementItems.current[i]["code"];
+        element.id = "element-" + i;
+        element.setAttribute("data-element-id", elementId);
+        element.setAttribute("data-element-title", title);
+        element.setAttribute("data-element-code", code);
         element.style.backgroundColor = code;
-        element.children[0].children[0].children[0].setAttribute("onclick", "upButton(" + (i + 1) + ")");
-        element.children[0].children[1].children[0].setAttribute("onclick", "downButton(" + (i + 1) + ")");
-        element.children[2].children[0].setAttribute("onclick", "eleDelete(" + (i + 1) + ")");
         element.children[1].innerHTML = title;
-        (element.children[3] as HTMLInputElement).value = id;
-        element.children[3].id = "element-" + (i + 1) + "-id";
-        (element.children[4] as HTMLInputElement).value = title;
-        (element.children[4] as HTMLInputElement).id = "element-" + (i + 1) + "-title";
-        (element.children[5] as HTMLInputElement).value = code;
-        (element.children[5] as HTMLInputElement).id = "element-" + (i + 1) + "-code";
-        (element.children[6] as HTMLInputElement).value = "0";
-        (element.children[6] as HTMLInputElement).id = "element-" + (i + 1) + "-content";
       }
     }
   }
 
-  function upButton(index: number) {
-    if (0 < index - 1) {
-      $("#element-" + index).insertBefore("#element-" + (index - 1));
+  //上ボタン
+  const upButton = (event: React.MouseEvent<HTMLDivElement>) => {
+    const indexStr = event.currentTarget.parentElement?.parentElement?.id;
+    if (indexStr) {
+      const index = parseInt(indexStr.replace("element-", ""), 10);
+      if (-1 < index && 0 < elementItems.current.length) {
+        $("#element-" + index).insertBefore("#element-" + (index - 1));
+        createElementItems();
+        reElements();
+      }
+    }
+  };
+
+  //下ボタン
+  const downButton = (event: React.MouseEvent<HTMLDivElement>) => {
+    const indexStr = event.currentTarget.parentElement?.parentElement?.id;
+    if (indexStr) {
+      const index = parseInt(indexStr.replace("element-", ""), 10);
+      if (index <= elementItems.current.length) {
+        $("#element-" + index).insertAfter("#element-" + (index + 1));
+        createElementItems();
+        reElements();
+      }
+    }
+  };
+
+  //削除ボタン
+  const eleDelete = (event: React.MouseEvent<HTMLDivElement>) => {
+    const indexStr = event.currentTarget.parentElement?.parentElement?.id;
+    const indexId = event.currentTarget.parentElement?.parentElement?.getAttribute("data-element-id");
+    if (indexStr && indexId && indexId != "content" && indexId != "") {
+      const index = parseInt(indexStr.replace("element-", ""), 10);
+      $("#element-" + index).remove();
       createElementItems();
-      reElements();
     }
-  }
+  };
 
-  function downButton(index: number) {
-    if (index + 1 <= elementItems.length) {
-      $("#element-" + index).insertAfter("#element-" + (index + 1));
-      createElementItems();
-      reElements();
-    }
-  }
+  //構成要素追加
+  const elementAdd = () => {
+    const index = elementItems.current.length;
+    const newElement: eleResultData = {
+      id: "",
+      title: "タイトル",
+      code: "",
+    };
+    elementItems.current.push(newElement);
+    elementAddIndex.current = index;
+    setEleResults([...eleResults, newElement]);
+  };
 
-  function eleDelete(index: number) {
-    $("#element-" + index).remove();
-    createElementItems();
-  }
+  // elementSelect-----------------------------------------------------
+  useEffect(() => {
+    fetch("http://localhost:8080/webadmin/getElementItem?page=1", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setList(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
 
-  function elementAdd() {
-    var elements = document.getElementById("elements");
-    if (!elements) {
-      console.error("Element with id 'elements' not found");
-      return;
+  const elementSelect = (index: number) => {
+    $(".entry").css("box-shadow", "none");
+    $(".element-" + index).css("box-shadow", "0 0 0 .25rem rgba(13, 110, 253, .25)");
+    const selectedIndex = document.getElementById("selected-index") as HTMLInputElement;
+    if (selectedIndex) {
+      selectedIndex.value = index.toString();
     }
-    var elementTemplate = document.getElementById("element-template");
-    if (!elementTemplate) {
-      console.error("Element with id 'element-template' not found");
-      return;
+  };
+
+  const elementSelecedComp = () => {
+    const selectedIndex = document.getElementById("selected-index") as HTMLInputElement;
+    if (selectedIndex) {
+      const selectedId = document.getElementById(`element-${selectedIndex.value}-id`) as HTMLInputElement;
+      const selectedTitle = document.getElementById(`element-${selectedIndex.value}-title`) as HTMLInputElement;
+      const selectedCode = document.getElementById(`element-${selectedIndex.value}-code`) as HTMLInputElement;
+
+      if (selectedId && selectedTitle && selectedCode) {
+        elementItems.current[elementAddIndex.current]["id"] = selectedId.value;
+        elementItems.current[elementAddIndex.current]["title"] = selectedTitle.value;
+        elementItems.current[elementAddIndex.current]["code"] = selectedCode.value;
+        reElements();
+      }
     }
-    var element = elementTemplate.cloneNode(true) as HTMLElement;
-    var elementnumber = elementItems.length;
-    element.style.display = "";
-    element.setAttribute("data-name", "element-content");
-    element.id = "element-" + (elementnumber + 1);
-    elements.append(element);
-    var newElement: { id: string; title: string; code: string } = { id: "", title: "", code: "" };
-    newElement["id"] = "";
-    newElement["title"] = "";
-    newElement["code"] = "";
-    elementItems.push(newElement);
-    window.open("/element-item?elementnumber=" + elementnumber, undefined, "top=100,left=100,width=1200,height=1000");
-  }
+  };
 
   function doSubmitTemp() {
-    var content = "";
-    for (var i = 0; i < elementItems.length; i++) {
-      if (elementItems[i]["id"] == "content") {
-        content += "###content###,";
+    let eleContent = "";
+    for (var i = 0; i < elementItems.current.length; i++) {
+      if (elementItems.current[i]["id"] == "content") {
+        eleContent += "###content###,";
       } else {
-        content += "###element(" + elementItems[i]["id"] + ")###,";
+        eleContent += "###element(" + elementItems.current[i]["id"] + ")###,";
       }
     }
-    content = content.slice(0, -1);
-    const elementContent = document.getElementById("element-conent");
-    if (elementContent) {
-      (elementContent as HTMLInputElement).value = content;
-    } else {
-      console.error("Element with id 'element-conent' not found");
-      return;
-    }
-
+    eleContent = eleContent.slice(0, -1);
     const contentForm = document.forms.namedItem("contentform") as HTMLFormElement;
-    if (contentForm) {
+    const contentInput = document.getElementById("content") as HTMLInputElement;
+    if (contentForm && contentInput) {
+      contentInput.value = eleContent;
       contentForm.submit();
     } else {
-      console.error("Form with name 'contentform' not found");
+      console.error("contentForm or content not found");
     }
   }
 
@@ -306,11 +374,11 @@ export const Content = () => {
                     </div>
                   </>
                 ) : (
-                  ""
+                  <input type="hidden" id="published" name="published" value="1" />
                 )}
 
                 {/* template select */}
-                {mode == "" ? (
+                {mode == "" && (
                   <>
                     <div className="mb-3 sky-input-pulldown">
                       <label htmlFor="template" className="sky-form-label fw-bold ms-1">
@@ -319,12 +387,10 @@ export const Content = () => {
                       <select className="form-select form-select-lg border-warning" aria-label=".form-select-lg example" id="template" name="template" dangerouslySetInnerHTML={{ __html: templateOutput }}></select>
                     </div>
                   </>
-                ) : (
-                  ""
                 )}
 
                 {/* element select */}
-                {mode == "element" ? (
+                {mode == "element" && (
                   <>
                     <div className="mb-3 sky-input-pulldown">
                       <label htmlFor="template" className="sky-form-label fw-bold ms-1">
@@ -333,8 +399,6 @@ export const Content = () => {
                       <select className="form-select form-select-lg border-warning" aria-label=".form-select-lg example" style={{ backgroundColor: elementcolor }} id="elementcolor" name="elementcolor" onChange={() => colorchange()} dangerouslySetInnerHTML={{ __html: result.colorOutput }}></select>
                     </div>
                   </>
-                ) : (
-                  ""
                 )}
 
                 {/* title */}
@@ -365,104 +429,60 @@ export const Content = () => {
                         content
                       </label>
                       <div className="form-control border-warning" id="elements" data-name="content">
-                        {eleResults.map((eleResult: any, index: number) =>
-                          eleResult.content != null && eleResult.content == "1" ? (
-                            <div className="sky-Content-element-card justify-content-between" data-name="element-content" id={`element-${index + 1}`}>
-                              <div className="">
-                                <a href="javascript:void();">
-                                  <div className="btn btn-warning" onClick={() => upButton(index + 1)}>
-                                    ▲
-                                  </div>
-                                </a>
-                                <a href="javascript:void();">
-                                  <div className="btn btn-warning" onClick={() => downButton(index + 1)}>
-                                    ▼
-                                  </div>
-                                </a>
-                              </div>
-                              <h5 className="d-flex justify-content-center align-items-center" id={`element-${index + 1}-title`}>
-                                子コンテンツ部分
-                              </h5>
+                        {eleResults.map((eleResult: eleResultData, index: number) =>
+                          eleResult.id == null || eleResult.id == "content" ? (
+                            <div className="sky-Content-element-card justify-content-between" id={`element-${index}`} data-name="element-content" data-element-id="content" data-element-title="" data-element-code="">
                               <div>
-                                <button className="btn btn-warning" type="button" onClick={() => eleDelete(index + 1)}>
-                                  削除
-                                </button>
+                                <div className="btn btn-warning mx-1 sky-Content-element-arrow" onClick={upButton}>
+                                  ▲
+                                </div>
+                                <div className="btn btn-warning mx-1 sky-Content-element-arrow" onClick={downButton}>
+                                  ▼
+                                </div>
                               </div>
-                              <input type="hidden" id={`element-${index + 1}-id`} value={eleResult.id} />
-                              <input type="hidden" id={`element-${index + 1}-title`} value={eleResult.title} />
-                              <input type="hidden" id={`element-${index + 1}-code`} value={eleResult.code} />
-                              <input type="hidden" id={`element-${index + 1}-content`} value="1" />
+                              <h5 className="d-flex justify-content-center align-items-center">コンテンツ部分</h5>
+                              <div className="d-flex justify-content-center align-items-center">
+                                <div className="btn btn-warning sky-Content-element-delete" onClick={eleDelete}>
+                                  <img src={elementDelImg} alt="elementDelImg" />
+                                </div>
+                              </div>
                             </div>
                           ) : (
-                            <div className="sky-Content-element-card justify-content-between" data-name="element-content" id={`element-${index + 1}`} style={{ backgroundColor: eleResult.code }}>
-                              <div className="">
-                                <a href="javascript:void(0);">
-                                  <div className="btn btn-warning" onClick={() => upButton(index + 1)}>
-                                    ▲
-                                  </div>
-                                </a>
-                                <a href="javascript:void();">
-                                  <div className="btn btn-warning" onClick={() => downButton(index + 1)}>
-                                    ▼
-                                  </div>
-                                </a>
-                              </div>
-                              <h5 className="d-flex justify-content-center align-items-center" id={`element-${index + 1}-title`}>
-                                {eleResult.title}
-                              </h5>
+                            <div className="sky-Content-element-card justify-content-between" id={`element-${index}`} data-name="element-content" data-element-id={eleResult.id} data-element-title={eleResult.title} data-element-code={eleResult.code} style={{ backgroundColor: eleResult.code }}>
                               <div>
-                                <button className="btn btn-warning" type="button" onClick={() => eleDelete(index + 1)}>
-                                  削除
-                                </button>
+                                <div className="btn btn-warning mx-1 sky-Content-element-arrow" onClick={upButton}>
+                                  ▲
+                                </div>
+                                <div className="btn btn-warning mx-1 sky-Content-element-arrow" onClick={downButton}>
+                                  ▼
+                                </div>
                               </div>
-                              <input type="hidden" id={`element-${index + 1}-id`} value={eleResult.id} />
-                              <input type="hidden" id={`element-${index + 1}-title`} value={eleResult.title} />
-                              <input type="hidden" id={`element-${index + 1}-code`} value={eleResult.code} />
-                              <input type="hidden" id="element-<%=(i + 1)%>-content" value="0" />
+                              <h5 className="d-flex justify-content-center align-items-center">{eleResult.title}</h5>
+                              <div>
+                                <div className="btn btn-warning sky-Content-element-delete" onClick={eleDelete}>
+                                  <img src={elementDelImg} alt="elementDelImg" />
+                                </div>
+                              </div>
                             </div>
                           )
                         )}
                       </div>
+
+                      {/*elementAdd */}
                       <div>
-                        <a href="#" onClick={elementAdd}>
+                        <a href="#" onClick={elementAdd} data-bs-toggle="modal" data-bs-target="#element-selectModal">
                           <div className="d-flex justify-content-center align-items-center btn btn-warning p-3 my-2">
                             <img className="sky-list-newCreate-img" src={elementAddImg} alt="elementAdd" />
                           </div>
                         </a>
                       </div>
-                      {/* template-element start */}
-                      <div className="sky-Content-element-card justify-content-between" data-name="" id="element-template" style={{ display: "none", backgroundColor: "" }}>
-                        <div className="">
-                          <div className="btn btn-warning">
-                            <a href="javascript:void();" id="up-element-1">
-                              ▲
-                            </a>
-                          </div>
-                          <div className="btn btn-warning">
-                            <a href="javascript:void();" id="down-element-1">
-                              ▼
-                            </a>
-                          </div>
-                        </div>
-                        <h5 className="d-flex justify-content-center align-items-center">タイトル</h5>
-                        <div>
-                          <button className="btn btn-warning" type="button" onClick={() => {}}>
-                            削除
-                          </button>
-                        </div>
-                        <input type="hidden" id="element-id" value="" />
-                        <input type="hidden" id="element-title" value="" />
-                        <input type="hidden" id="element-code" value="" />
-                        <input type="hidden" id="element-content" value="" />
-                      </div>
-                      {/* template-element end */}
                     </div>
-                    <input type="hidden" name="id" value="" />
-                    <input type="hidden" id="element-conent" name="content" value="" />
+                    <input type="hidden" name="id" value={id} />
                     <input type="hidden" name="type" value="template" />
-                    <input type="hidden" id="published" name="published" value="1" />
+                    <input type="hidden" name="content" id="content" value={content} />
                   </>
                 ) : (
+                  //template以外の場合
                   <div className="mb-3">
                     <label htmlFor="content" className="sky-form-label fw-bold ms-1">
                       content
@@ -472,21 +492,23 @@ export const Content = () => {
                 )}
 
                 {/* url */}
-                <div className="mb-3">
-                  <label htmlFor="url" className="sky-form-label fw-bold ms-1">
-                    url
-                  </label>
-                  <input type="text" className="form-control border-warning sky-input" id="url" name="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Enter url" required />
-                </div>
+                {mode != "template" && (
+                  <div className="mb-3">
+                    <label htmlFor="url" className="sky-form-label fw-bold ms-1">
+                      url
+                    </label>
+                    <input type="text" className="form-control border-warning sky-input" id="url" name="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Enter url" required />
+                  </div>
+                )}
 
                 {/* save */}
                 <button type="button" className="btn btn-warning w-100 mb-2 mt-5 sky-submit" data-bs-toggle="modal" data-bs-target="#exampleModal">
                   Save
                 </button>
-                <input type="hidden" name="id" value="5" />
-                <input type="hidden" name="type" value="" />
+                <input type="hidden" name="id" value={id} />
+                <input type="hidden" name="type" value={mode} />
 
-                {/* modal */}
+                {/* submit modal */}
                 <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
@@ -499,13 +521,64 @@ export const Content = () => {
                         <button type="button" className="btn me-2" data-bs-dismiss="modal">
                           キャンセル
                         </button>
-                        <button type="button" className="btn btn-warning px-4" onClick={doSubmit}>
-                          登録
-                        </button>
+                        {mode == "template" ? (
+                          <button type="button" className="btn btn-warning px-4" onClick={doSubmitTemp}>
+                            登録
+                          </button>
+                        ) : (
+                          <button type="button" className="btn btn-warning px-4" onClick={doSubmit}>
+                            登録
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* element Select modal */}
+                {mode == "template" && (
+                  <div className="modal fade" id="element-selectModal" tabIndex={-1} aria-labelledby="element-selectModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                    <div className="modal-dialog modal-dialog-centered">
+                      <div className="modal-content">
+                        <div className="modal-header">Element Select</div>
+                        <section className="sky-list-container">
+                          {list.results.map((result: any, index: any) => (
+                            <>
+                              <a
+                                href="#"
+                                onClick={() => {
+                                  elementSelect(index);
+                                }}
+                                key={index}
+                              >
+                                <div className={`sky-list-card entry element-${index}`} style={{ backgroundColor: "elementcolor" }}>
+                                  <p className="mb-0">ID: {result.id}</p>
+                                  <h5 className="mb-1">{result.title}</h5>
+                                </div>
+                              </a>
+                              <input type="hidden" id={`element-${index}-id`} value={result.id} />
+                              <input type="hidden" id={`element-${index}-title`} value={result.title} />
+                              <input type="hidden" id={`element-${index}-code`} value={result.elementcolor} />
+                            </>
+                          ))}
+                          <input type="hidden" id="selected-index" value="" />
+                          <input type="hidden" id="selected-value" value="" />
+                          <nav aria-label="Page navigation example">
+                            <ul className="pagination justify-content-center align-items-center mt-5" dangerouslySetInnerHTML={{ __html: list.pagerOutput }}></ul>
+                          </nav>
+                        </section>
+                        <div className="modal-footer d-flex justify-content-center align-items-center">
+                          <button type="button" className="btn mx-5" data-bs-dismiss="modal">
+                            キャンセル
+                          </button>
+                          <button type="button" className="btn btn-warning px-4 mx-5" data-bs-dismiss="modal" onClick={elementSelecedComp}>
+                            選択
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </form>
             </div>
           </div>

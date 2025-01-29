@@ -199,9 +199,22 @@ input {
 }
 .sky-Content-element-card:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transform: translateY(5px);
+  transform: translateY(1px);
 }
 
+.sky-Content-element-arrow:hover {
+  cursor: pointer;
+  background-color: var(--sky-yellow-1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(1px);
+}
+
+.sky-Content-element-delete:hover {
+  cursor: pointer;
+  background-color: var(--sky-yellow-1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(1px);
+}
 
 /* Login */
 .sky-Login-logo {
