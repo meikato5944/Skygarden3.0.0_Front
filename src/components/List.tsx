@@ -100,12 +100,12 @@ export const List = () => {
         <h1 className="ms-1 mb-3">一覧:{list.loginName}</h1>
         <div className="row">
           <div className="col-xs-12 col-sm-3 mb-2 sky-input-pulldown">
-            <select className="form-select sky-bg-4 sky-list-sort" id="sort" name="sort" onChange={sortList} dangerouslySetInnerHTML={{ __html: list.sortOutput }}></select>
+            <select className="form-select sky-bg-4 sky-list-sort sky-fc-1" id="sort" name="sort" onChange={sortList} dangerouslySetInnerHTML={{ __html: list.sortOutput }}></select>
           </div>
           {list.registerMessage ? <div>list.registerMessage</div> : ""}
           <div className="mb-3 sky-button-newCreate">
             <a href={`/content?mode=${mode}`}>
-              <button className="btn btn-warning w-100">
+              <button className="btn btn-warning w-100 sky-bg-4">
                 <img className="sky-list-newCreate-img" src={newCreate} alt="newCreate" />
                 <span>newCreate</span>
               </button>

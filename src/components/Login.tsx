@@ -32,7 +32,7 @@ export const Login = () => {
               <div className="mb-3">
                 <input type="password" className="form-control border-warning sky-input" placeholder="Password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
-              <button type="submit" className="btn btn-warning w-100 mt-2">
+              <button type="submit" className="btn btn-warning w-100 mt-2 sky-bg-2">
                 Go
               </button>
             </div>

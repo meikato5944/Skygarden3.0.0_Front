@@ -79,7 +79,8 @@ export const Content = () => {
     colorOutput: "",
     eleResults: [],
   });
-  const elementItems = useRef<eleResultData[]>([]); // useRefを使用して値を保持
+  const elementItems = useRef<eleResultData[]>([]); 
+  const [isPublished, setIsPublished] = useState(true);
 
   //elementSelect
   let elementAddIndex = useRef(0);
@@ -155,7 +156,9 @@ export const Content = () => {
     }
   }, []);
 
-  const publishedCheckbox = () => {};
+  const publishedCheckbox = () => {
+    setIsPublished((prev) => !prev);
+  };
 
   const preview = () => {
     const preview = document.getElementById("contentform") as HTMLFormElement;
@@ -385,20 +388,20 @@ export const Content = () => {
                       <div className="d-flex justify-content-center">
                         {/* publish */}
                         <div className="form-check form-switch sky-Content-publish">
-                          <input className="form-check-input sky-input-switch" type="checkbox" role="switch" id="published" name="published" value="1" onChange={publishedCheckbox} checked />
+                          <input className="form-check-input sky-input-switch" type="checkbox" role="switch" id="published" name="published" value="1" onChange={publishedCheckbox} checked={isPublished} />
                           <label className="form-check-label ms-1 pt-1" htmlFor="published">
                             publish
                           </label>
                         </div>
                         {/* preview */}
                         <div className="sky-Content-preview">
-                          <a className="btn btn-warning sky-Content-preview-item" id="preview-button" onClick={preview}>
+                          <a className="btn btn-warning sky-Content-preview-item sky-bg-2" id="preview-button" onClick={preview}>
                             <img src={previewImg} alt="preview" />
                           </a>
                         </div>
                         {/* delete */}
-                        <div className="sky-Content-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                          <a className="btn btn-warning sky-Content-delete-item">
+                        <div className="sky-Content-delete sky-bg-1" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                          <a className="btn btn-warning sky-Content-delete-item sky-bg-2">
                             <img src={deleteImg} alt="delete" />
                           </a>
                         </div>
@@ -409,7 +412,7 @@ export const Content = () => {
                   <>
                     {/* delete */}
                     <div className="sky-Content-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                      <a className="btn btn-warning sky-Content-delete-item ms-auto">
+                      <a className="btn btn-warning sky-Content-delete-item ms-auto sky-bg-2">
                         <img src={deleteImg} alt="delete" />
                       </a>
                     </div>
@@ -511,7 +514,7 @@ export const Content = () => {
                       {/*elementAdd */}
                       <div>
                         <a href="#" onClick={elementAdd} data-bs-toggle="modal" data-bs-target="#element-selectModal">
-                          <div className="d-flex justify-content-center align-items-center btn btn-warning p-3 my-2">
+                          <div className="d-flex justify-content-center align-items-center btn btn-warning p-3 my-2 sky-bg-2">
                             <img className="sky-list-newCreate-img" src={elementAddImg} alt="elementAdd" />
                           </div>
                         </a>
@@ -542,7 +545,7 @@ export const Content = () => {
                 )}
 
                 {/* save */}
-                <button type="button" className="btn btn-warning w-100 mb-2 mt-5 sky-submit" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <button type="button" className="btn btn-warning w-100 mb-2 mt-5 sky-submit sky-bg-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
                   Save
                 </button>
                 <input type="hidden" name="id" value={id} />

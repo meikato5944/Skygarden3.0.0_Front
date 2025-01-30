@@ -1,4 +1,6 @@
 import React from "react";
+import deleteImg from "../common/image/trash.svg";
+import newCreate from "../common/image/plus-lg.svg";
 
 export const Setting = () => {
   const addElement = () => {
@@ -69,10 +71,10 @@ export const Setting = () => {
 
   return (
     <>
-      <div style={{ display: "flex" }}>
+      <section style={{ display: "flex", paddingBottom: "200px" }}>
         <div className="flex-grow-1 d-flex justify-content-center align-items-center p-4">
           <div className="w-100 sky-Setting-content">
-            <h2 className="text-center">設定画面</h2>
+            <h2 className="text-center">Setting</h2>
             <div className="card border-warning rounded sky-Setting-card">
               <div className="card-body">
                 <form id="settingsform" name="settingsform" action="/webadmin/setting_post" method="post">
@@ -80,8 +82,8 @@ export const Setting = () => {
                   <div className="d-sm-flex">
                     <input className="form-control sky-input" id="elementcolor-name" type="text" placeholder="要素名 例:header" />
                     <input className="form-control sky-input" id="elementcolor-code" type="text" placeholder="Code 例:#000000" />
-                    <button className="btn btn-warning fw-bold" id="add-element-button" type="button" onClick={addElement} style={{ minWidth: "100px" }}>
-                      追加
+                    <button className="btn btn-warning fw-bold sky-bg-2" id="add-element-button" type="button" onClick={addElement} style={{ minWidth: "100px" }}>
+                      <img className="sky-list-newCreate-img" src={newCreate} alt="newCreate" />
                     </button>
                     <input id="elements-color-value" name="elements-color-value" type="hidden" />
                   </div>
@@ -92,8 +94,8 @@ export const Setting = () => {
                         <div className="d-flex justify-content-center align-items-center w-100" style={{ backgroundColor: "#FFF" }}>
                           name
                         </div>
-                        <button className="btn btn-warning fw-bold" type="button" onClick={() => deleteElement(1)} style={{ minWidth: "100px" }}>
-                          削除
+                        <button className="btn btn-warning fw-bold sky-bg-2" type="button" onClick={() => deleteElement(1)} style={{ minWidth: "100px" }}>
+                          <img src={deleteImg} alt="delete" />
                         </button>
                       </div>
                       <input type="hidden" id="element-name-1" name="element-name-1" value="name" />
@@ -104,16 +106,16 @@ export const Setting = () => {
                   <div id="template-element" className="flex setting-delete" style={{ display: "none" }}>
                     <div className="d-sm-flex">
                       <div className="d-flex justify-content-center align-items-center w-100" style={{ backgroundColor: "" }}></div>
-                      <button className="btn btn-warning fw-bold" type="button" style={{ minWidth: "100px" }}>
-                        削除
+                      <button className="btn btn-warning fw-bold sky-bg-2" type="button" style={{ minWidth: "100px" }}>
+                        <img src={deleteImg} alt="delete" />
                       </button>
                     </div>
                     <input type="hidden" id="" name="" value="" />
                     <input type="hidden" id="" name="" value="" />
                   </div>
                   <div className="text-center">
-                    <button type="button" className="btn btn-warning w-100 mb-2 mt-5 sky-submit" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                      登録
+                    <button type="button" className="btn btn-warning w-100 mb-2 mt-5 sky-submit sky-bg-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                      Save
                     </button>
                   </div>
                 </form>
@@ -142,7 +144,7 @@ export const Setting = () => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 };

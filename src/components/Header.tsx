@@ -82,16 +82,16 @@ export const Header = () => {
       </nav>
 
       {/* SP */}
-      <nav className="navbar bg-warning p-2 sky-header">
+      <nav className="navbar bg-warning p-2 sky-header sky-bg-4">
         <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
           <span className="navbar-toggler-icon"></span>
         </button>
-        <a className="navbar-brand" href="/?mode=">
+        <a className="navbar-brand sky-fc-1" href="/?mode=">
           <img src={logo} alt="logo.png" className="sky-logo" />
           Skygarden
         </a>
       </nav>
-      <div className="offcanvas offcanvas-start sky-bg-2" tabIndex={-1} id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+      <div className="offcanvas offcanvas-start sky-bg-1" tabIndex={-1} id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
         <div className="offcanvas-header m-2">
           <a className="navbar-brand" href="#">
             <img src={logo} alt="logo.png" className="sky-logo" />

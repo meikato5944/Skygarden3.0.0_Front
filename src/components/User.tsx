@@ -5,7 +5,7 @@ export const User = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [adminSelected, setAdminSelected] = useState("");
+  const [admin, setAdmin] = useState(false);
 
   const doSubmit = () => {
     const contentForm = document.forms.namedItem("contentform") as HTMLFormElement;
@@ -18,7 +18,7 @@ export const User = () => {
   };
 
   const handleAdminToggle = () => {
-    setAdminSelected((prev) => (prev === "selected" ? "" : "selected"));
+    setAdmin((prev) => !prev);
   };
 
   //値取得
@@ -38,7 +38,7 @@ export const User = () => {
           setName(data.name || "");
           setPassword(data.password || "");
           setEmail(data.email || "");
-          setAdminSelected(data.adminSelected ? "seleced" : "");
+          setAdmin(data.admin == "1" ? true : false);
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -54,7 +54,7 @@ export const User = () => {
           <div className="sky-User-box">
             <form id="contentform" name="contentform" action="/webadmin/user_post" method="POST">
               <div className="form-check form-switch mb-1 sky-User-adminSwitch">
-                <input className="form-check-input sky-input-switch" type="checkbox" role="switch" id="admin" name="admin" value="1" onChange={handleAdminToggle} />
+                <input className="form-check-input sky-input-switch" type="checkbox" role="switch" id="admin" name="admin" value="1" onChange={handleAdminToggle} checked={admin} />
                 <label className="form-check-label ms-2" htmlFor="admin">
                   admin
                 </label>
@@ -85,7 +85,7 @@ export const User = () => {
                 <input type="email" className="form-control sky-input" id="email" name="email" value={email} placeholder="Enter your email" onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div className="text-center">
-                <button type="button" className="btn btn-warning w-100 mb-2 mt-5 sky-submit" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <button type="button" className="btn btn-warning w-100 mb-2 mt-5 sky-submit sky-bg-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
                   Save
                 </button>
               </div>
