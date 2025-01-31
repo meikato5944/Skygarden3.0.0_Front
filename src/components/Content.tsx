@@ -10,6 +10,7 @@ export interface ContentData {
   schedule_unpublished: string;
   title: string;
   head: string;
+  template: string;
   content: string;
   url: string;
   elementcolor: string;
@@ -56,6 +57,7 @@ export const Content = () => {
   let screenName = "";
   const [schedule_published, setSchedule_published] = useState("");
   const [schedule_unpublished, setSchedule_unpublished] = useState("");
+  const [template, setTemplate] = useState("");
   const [head, setHead] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -70,6 +72,7 @@ export const Content = () => {
     screenName: "",
     schedule_published: "",
     schedule_unpublished: "",
+    template: "",
     title: "",
     head: "",
     content: "",
@@ -79,7 +82,7 @@ export const Content = () => {
     colorOutput: "",
     eleResults: [],
   });
-  const elementItems = useRef<eleResultData[]>([]); 
+  const elementItems = useRef<eleResultData[]>([]);
   const [isPublished, setIsPublished] = useState(true);
 
   //elementSelect
@@ -125,8 +128,9 @@ export const Content = () => {
           screenName = data.screenName || "";
           setSchedule_published(data.schedule_published || "");
           setSchedule_unpublished(data.schedule_unpublished || "");
-          setHead(data.head || "");
+          setTemplate(data.template || "");
           setTitle(data.title || "");
+          setHead(data.head || "");
           setContent(data.content || "");
           setUrl(data.url || "");
           setId(fetchId || "");
@@ -163,11 +167,10 @@ export const Content = () => {
   const preview = () => {
     const preview = document.getElementById("contentform") as HTMLFormElement;
     if (preview) {
-      preview.action = "/webadmin/preview.jsp";
+      preview.action = "http://localhost:8080/webadmin/preview";
       preview.target = "_blank";
+      preview.method = "post";
       preview.submit();
-      preview.target = "";
-      preview.action = "/webadmin/update_post.jsp";
     }
   };
 
@@ -427,7 +430,7 @@ export const Content = () => {
                       <label htmlFor="template" className="sky-form-label fw-bold ms-1">
                         template
                       </label>
-                      <select className="form-select form-select-lg border-warning" aria-label=".form-select-lg example" id="template" name="template" dangerouslySetInnerHTML={{ __html: templateOutput }}></select>
+                      <select className="form-select form-select-lg border-warning" aria-label=".form-select-lg example" id="template" name="template" value={template} onChange={(e) => setTemplate(e.target.value)} dangerouslySetInnerHTML={{ __html: templateOutput }}></select>
                     </div>
                   </>
                 )}
