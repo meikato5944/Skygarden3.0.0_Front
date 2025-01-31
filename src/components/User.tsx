@@ -6,21 +6,28 @@ export const User = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [admin, setAdmin] = useState(false);
-
-  const doSubmit = () => {
-    const contentForm = document.forms.namedItem("contentform") as HTMLFormElement;
-    if (contentForm) {
-      contentForm.submit();
-    } else {
-      console.error("Form with name 'contentform' not found");
-      return;
-    }
-  };
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleAdminToggle = () => {
     setAdmin((prev) => !prev);
   };
 
+  const doSubmit = () => {
+    const contentForm = document.forms.namedItem("contentform") as HTMLFormElement;
+    if (contentForm) {
+      if (!contentForm.checkValidity()) {
+        cancelButtonRef.current?.click();
+        setTimeout(() => {
+          contentForm.reportValidity();
+        }, 700); //.click()との関係で少し待機する必要がある
+      } else {
+        contentForm.submit();
+      }
+    } else {
+      console.error("Form with name 'contentform' not found");
+      return;
+    }
+  };
   //値取得
   useLayoutEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -68,15 +75,15 @@ export const User = () => {
               </div>
               <div className="mb-3">
                 <label htmlFor="username" className="sky-form-label">
-                  Username:
+                  Name:
                 </label>
-                <input type="text" className="form-control sky-input" name="name" value={name} placeholder="Enter your username" onChange={(e) => setName(e.target.value)} />
+                <input type="text" className="form-control sky-input" name="name" value={name} placeholder="Enter your username" onChange={(e) => setName(e.target.value)} required />
               </div>
               <div className="mb-3">
                 <label htmlFor="password" className="sky-form-label">
                   Password
                 </label>
-                <input type="password" className="form-control sky-input" id="password" name="password" value={password} placeholder="Enter a new password" onChange={(e) => setPassword(e.target.value)} />
+                <input type="password" className="form-control sky-input" id="password" name="password" value={password} placeholder="Enter a new password" onChange={(e) => setPassword(e.target.value)} required />
               </div>
               <div className="mb-3">
                 <label htmlFor="email" className="sky-form-label">
@@ -100,7 +107,7 @@ export const User = () => {
                       </h5>
                     </div>
                     <div className="modal-footer">
-                      <button type="button" className="btn me-2" data-bs-dismiss="modal">
+                      <button type="button" className="btn me-2" data-bs-dismiss="modal" ref={cancelButtonRef}>
                         キャンセル
                       </button>
                       <button type="button" className="btn btn-warning px-4" onClick={doSubmit}>

@@ -68,7 +68,7 @@ export const UserList = () => {
           </div>
           {list.registerMessage ? <div>list.registerMessage</div> : ""}
           <div className="mb-3 sky-button-newCreate">
-            <a href="/user.jsp">
+            <a href="/user">
               <button className="btn btn-warning w-100 sky-bg-4">
                 <img className="sky-list-newCreate-img" src={newCreate} alt="newCreate" />
                 <span>newCreate</span>
