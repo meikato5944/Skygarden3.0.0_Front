@@ -78,7 +78,7 @@ export const Setting = () => {
             <div className="card border-warning rounded sky-Setting-card">
               <div className="card-body">
                 <form id="settingsform" name="settingsform" action="/webadmin/setting_post" method="post">
-                  <h4 className="text-center fw-bold">構成要素色</h4>
+                  <h5 className="fw-bold ms-2">elementColor</h5>
                   <div className="d-sm-flex">
                     <input className="form-control sky-input" id="elementcolor-name" type="text" placeholder="要素名 例:header" />
                     <input className="form-control sky-input" id="elementcolor-code" type="text" placeholder="Code 例:#000000" />
