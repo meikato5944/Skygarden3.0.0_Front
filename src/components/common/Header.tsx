@@ -1,5 +1,7 @@
 import React from "react";
-import logo from "../common/image/logo.png";
+import logo from "../../common/image/logo.png";
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 export const Header = () => {
   return (
@@ -72,7 +74,7 @@ export const Header = () => {
               </a>
             </li>
             <li className="nav-item ms-3">
-              <a className="nav-link" href="http://localhost:8080/webadmin/logout">
+              <a className="nav-link" href={`${API_BASE_URL}/logout`}>
                 Logout
               </a>
             </li>
@@ -159,7 +161,7 @@ export const Header = () => {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="http://localhost:8080/webadmin/logout">
+              <a className="nav-link" href={`${API_BASE_URL}/logout`}>
                 Logout
               </a>
             </li>

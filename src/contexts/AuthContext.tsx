@@ -4,13 +4,14 @@ interface AuthContextType {
   isAuth: boolean;
 }
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const AuthContext = createContext<AuthContextType>({ isAuth: true });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuth, setIsAuth] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch("http://localhost:8080/webadmin/auth", {
+    fetch(`${API_BASE_URL}/auth`, {
       credentials: "include",
     })
       .then((res) => res.json())

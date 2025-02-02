@@ -4,6 +4,8 @@ import elementAddImg from "../common/image/plus-lg.svg";
 import elementDelImg from "../common/image/trash.svg";
 import deleteImg from "../common/image/trash.svg";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 export interface ContentData {
   screenName: string;
   schedule_published: string;
@@ -116,7 +118,7 @@ export const Content = () => {
     let fetchId = params.get("id") || "";
     let fetchmode = params.get("mode") || "";
     if (fetchId != "") {
-      fetch("http://localhost:8080/webadmin/getcontent?mode=" + fetchmode + "&id=" + fetchId, {
+      fetch(`${API_BASE_URL}/getcontent?mode=${fetchmode}&id=${fetchId}`, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -146,12 +148,11 @@ export const Content = () => {
           console.error("Error fetching data:", error);
         });
     } else {
-      fetch("http://localhost:8080/webadmin/gettemplate", {
+      fetch(`${API_BASE_URL}/gettemplate`, {
         method: "GET",
       })
         .then((res) => res.text())
         .then((data) => {
-          // console.log(data);
           setTemplateOutput(data || "");
         })
         .catch((error) => {
@@ -167,7 +168,7 @@ export const Content = () => {
   const preview = () => {
     const preview = document.getElementById("contentform") as HTMLFormElement;
     if (preview) {
-      preview.action = "http://localhost:8080/webadmin/preview";
+      preview.action = API_BASE_URL + "/preview";
       preview.target = "_blank";
       preview.method = "post";
       preview.submit();
@@ -292,7 +293,7 @@ export const Content = () => {
 
   // elementSelect-----------------------------------------------------
   useEffect(() => {
-    fetch("http://localhost:8080/webadmin/getElementItem?page=1", {
+    fetch(`${API_BASE_URL}/getElementItem?page=1`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -369,7 +370,7 @@ export const Content = () => {
           <h2 className="text-center mb-3">{screenName}入稿画面</h2>
           <div className="card border-warning rounded sky-bg-1">
             <div className="card-body">
-              <form id="contentform" name="contentform" action="http://localhost:8080/webadmin/update_post" method="POST">
+              <form id="contentform" name="contentform" action={`${API_BASE_URL}/update_post`} method="POST">
                 {/* publish&preview  */}
                 {mode == "" ? (
                   <>
@@ -647,7 +648,7 @@ export const Content = () => {
                   </div>
                 </div>
               </div>
-              <form id="deleteform" name="deleteform" action="http://localhost:8080/webadmin/delete_post" method="POST">
+              <form id="deleteform" name="deleteform" action={`${API_BASE_URL}/delete_post`} method="POST">
                 <input type="hidden" name="id" id="deleteId" value={id} />
                 <input type="hidden" name="mode" value={mode} />
               </form>

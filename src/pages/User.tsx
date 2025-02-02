@@ -1,5 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 export const User = () => {
   const [id, setId] = useState("");
   const [name, setName] = useState("");
@@ -34,7 +36,7 @@ export const User = () => {
     let fetchId = params.get("id") || "";
     setId(fetchId);
     if (fetchId != "") {
-      fetch("http://localhost:8080/webadmin/getuser?&id=" + fetchId, {
+      fetch(`${API_BASE_URL}/getuser?&id=${fetchId}`, {
         method: "GET",
         headers: {
           Accept: "application/json",

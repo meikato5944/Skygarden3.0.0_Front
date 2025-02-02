@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import logo from "../common/image/logo.png";
 import { useSearchParams } from "react-router-dom";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 export const Login = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +19,7 @@ export const Login = () => {
 
   return (
     <main>
-      <form action="http://localhost:8080/webadmin/login_post" method="post">
+      <form action={`${API_BASE_URL}/login_post`} method="post">
         <div className="d-flex flex-column justify-content-center align-items-center sky-Login-container">
           <h2 className="text-center mb-4">
             <img src={logo} alt="logo.png" className="img-fluid sky-Login-logo" /> <span className="fs-5">skygarden</span>
@@ -28,6 +30,12 @@ export const Login = () => {
               {errorMessage && <div style={{ color: "red" }}>{errorMessage}</div>}
               <div className="mb-3">
                 <input type="id" className="form-control border-warning sky-input" placeholder="ID" name="name" value={name} onChange={(e) => setName(e.target.value)} required />
+              </div>
+              <div className="mb-3">
+                <input type="password" className="form-control border-warning sky-input" placeholder="Password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </div>
+              <div className="mb-3">
+                <input type="password" className="form-control border-warning sky-input" placeholder="Password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
               <div className="mb-3">
                 <input type="password" className="form-control border-warning sky-input" placeholder="Password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
