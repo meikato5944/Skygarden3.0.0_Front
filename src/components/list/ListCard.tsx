@@ -1,7 +1,7 @@
 import React from "react";
 
 type ListCard = {
-  index: number;
+  key: number;
   isContent: boolean;
   mode: string;
   id: string;
@@ -11,12 +11,12 @@ type ListCard = {
   username: string;
 };
 
-export const ListCard: React.FC<ListCard> = ({ index, isContent, mode, id, title, url, updated, username }) => {
+export const ListCard: React.FC<ListCard> = ({ key, isContent, mode, id, title, url, updated, username }) => {
   return (
     <>
       {isContent ? (
-        <a href={`/content/?mode=${mode}&id=${id}`}>
-          <div className="sky-list-card" key={index}>
+        <a href={`/content/?mode=${mode}&id=${id}`} key={key}>
+          <div className="sky-list-card">
             <p className="mb-0">ID: {id}</p>
             <h3 className="mb-1">{title}</h3>
             <div className="mb-0 d-flex justify-content-between">
@@ -26,8 +26,8 @@ export const ListCard: React.FC<ListCard> = ({ index, isContent, mode, id, title
           </div>
         </a>
       ) : (
-        <a href={`/user?id=${id}`}>
-          <div className="sky-list-card" key={index}>
+        <a href={`/user?id=${id}`} key={key}>
+          <div className="sky-list-card">
             <p className="mb-0">ID: {id}</p>
             <h4 className="mb-1">{username}</h4>
           </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Sort } from "../components/list/Sort";
-import { NewCreateButton } from "../components/button/NewCreateButton";
+import { NewCreateButton } from "../components/common/button/NewCreateButton";
 
 type ListControlData = {
   screenName: string;

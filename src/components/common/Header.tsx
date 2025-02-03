@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../common/image/logo.png";
+import { getSessionData } from "../../utils/commonPrc";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 export const Header = () => {
+  const [username, setUserName] = useState("");
+  useEffect(() => {
+    getSessionData("name").then((data: string) => {
+      setUserName(data);
+    });
+  }, []);
+
   return (
     <>
       {/* PC */}
@@ -16,52 +24,45 @@ export const Header = () => {
             </a>
           </div>
           <ul className="navbar-nav ms-auto mt-4">
-            <li className="nav-item dropdown ms-3">
-              <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Content　
+            <li className="nav-item ms-3">
+              <a className="nav-link" href="/?mode=">
+                Content
               </a>
-              <ul className="dropdown-menu dropdown-menu-end sky-Sidemenu-dropdown">
-                <li>
-                  <a className="dropdown-item" href="/?mode=">
-                    content
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=template">
-                    template
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=element">
-                    element
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=stylesheet">
-                    css
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=script">
-                    js
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=image">
-                    image
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=file">
-                    file
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=movie">
-                    movie
-                  </a>
-                </li>
-              </ul>
+            </li>
+            <li className="nav-item ms-3">
+              <a className="nav-link" href="/?mode=template">
+                　Template
+              </a>
+            </li>
+            <li className="nav-item ms-3">
+              <a className="nav-link" href="/?mode=element">
+                　Element
+              </a>
+            </li>
+            <li className="nav-item ms-3">
+              <a className="nav-link" href="/?mode=stylesheet">
+                　CSS
+              </a>
+            </li>
+            <li className="nav-item ms-3">
+              <a className="nav-link" href="/?mode=script">
+                　JS
+              </a>
+            </li>
+            <li className="nav-item ms-3">
+              <a className="nav-link" href="/?mode=image">
+                　Image
+              </a>
+            </li>
+            <li className="nav-item ms-3">
+              <a className="nav-link" href="/?mode=file">
+                　File
+              </a>
+            </li>
+            <li className="nav-item ms-3">
+              <a className="nav-link" href="/?mode=movie">
+                　Movie
+              </a>
             </li>
             <li className="nav-item ms-3">
               <a className="nav-link" href="/user-list">
@@ -78,7 +79,7 @@ export const Header = () => {
                 Logout
               </a>
             </li>
-            <li className="nav-item my-4 ms-3">user: demo</li>
+            <li className="nav-item my-4 ms-3">user: {username}</li>
           </ul>
         </div>
       </nav>
@@ -103,52 +104,45 @@ export const Header = () => {
         </div>
         <div className="offcanvas-body ms-2">
           <ul className="nav flex-column">
-            <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <li className="nav-item">
+              <a className="nav-link" href="/?mode=">
                 Content
               </a>
-              <ul className="dropdown-menu ms-5">
-                <li>
-                  <a className="dropdown-item" href="/?mode=">
-                    content
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=template">
-                    template
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=element">
-                    element
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=stylesheet">
-                    css
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=script">
-                    js
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=image">
-                    image
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=file">
-                    file
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/?mode=movie">
-                    movie
-                  </a>
-                </li>
-              </ul>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/?mode=template">
+                　Template
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/?mode=element">
+                　Element
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/?mode=stylesheet">
+                　CSS
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/?mode=script">
+                　JS
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/?mode=image">
+                　Image
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/?mode=file">
+                　File
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/?mode=movie">
+                　Movie
+              </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="/user-list">
@@ -165,6 +159,7 @@ export const Header = () => {
                 Logout
               </a>
             </li>
+            <li className="nav-item my-4 ms-3">user: {username}</li>
           </ul>
         </div>
       </div>

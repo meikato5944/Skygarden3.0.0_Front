@@ -27,6 +27,7 @@ export const fetchListData = (isContent: boolean): Promise<ListData | UserListDa
   }
   return fetch(url, {
     method: "GET",
+    credentials: "include",
     headers: {
       Accept: "application/json",
     },
@@ -42,5 +43,20 @@ export const fetchListData = (isContent: boolean): Promise<ListData | UserListDa
       } else {
         return initialUserListData;
       }
+    });
+};
+
+export const getSessionData = (attribute: string): Promise<string> => {
+  return fetch(`${API_BASE_URL}/get-session?attribute=${attribute}`, {
+    method: "GET",
+    credentials: "include",
+  })
+    .then((res) => res.text())
+    .then((data) => {
+      return data;
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+      return "";
     });
 };

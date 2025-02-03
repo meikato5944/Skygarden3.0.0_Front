@@ -1,8 +1,41 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import deleteImg from "../common/image/trash.svg";
 import newCreate from "../common/image/plus-lg.svg";
+import { Modal } from "../components/common/Modal";
+import { SaveButton } from "../components/common/button/SaveButton";
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+type ColorElements = {
+  name: string;
+  code: string;
+};
 
 export const Setting = () => {
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const [colorElements, setColorElements] = useState<ColorElements[]>([
+    {
+      name: "",
+      code: "",
+    },
+  ]);
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/get-setting`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setColorElements(data.colorElements);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
   const addElement = () => {
     const inputname = document.getElementById("elementcolor-name") as HTMLInputElement;
     const inputcode = document.getElementById("elementcolor-code") as HTMLInputElement;
@@ -77,7 +110,7 @@ export const Setting = () => {
             <h2 className="text-center">Setting</h2>
             <div className="card border-warning rounded sky-Setting-card">
               <div className="card-body">
-                <form id="settingsform" name="settingsform" action="/webadmin/setting_post" method="post">
+                <form id="settingsform" name="settingsform" action={`${API_BASE_URL}/setting_post`} method="post">
                   <h5 className="fw-bold ms-2">elementColor</h5>
                   <div className="d-sm-flex">
                     <input className="form-control sky-input" id="elementcolor-name" type="text" placeholder="要素名 例:header" />
@@ -87,20 +120,21 @@ export const Setting = () => {
                     </button>
                     <input id="elements-color-value" name="elements-color-value" type="hidden" />
                   </div>
-
                   <div id="elements">
-                    <div id="element-1" data-name="colorelements">
-                      <div className="d-sm-flex">
-                        <div className="d-flex justify-content-center align-items-center w-100" style={{ backgroundColor: "#FFF" }}>
-                          name
+                    {colorElements.map((colorElement: any, index: number) => (
+                      <div key={index} id={`element-${index + 1}`} data-name="colorelements">
+                        <div className="d-sm-flex">
+                          <div className="d-flex justify-content-center align-items-center w-100" style={{ backgroundColor: colorElement.code }}>
+                            {colorElement.name}
+                          </div>
+                          <button className="btn btn-warning fw-bold sky-bg-2" type="button" onClick={() => deleteElement(index + 1)} style={{ minWidth: "100px" }}>
+                            <img src={deleteImg} alt="delete" />
+                          </button>
                         </div>
-                        <button className="btn btn-warning fw-bold sky-bg-2" type="button" onClick={() => deleteElement(1)} style={{ minWidth: "100px" }}>
-                          <img src={deleteImg} alt="delete" />
-                        </button>
+                        <input type="hidden" id={`element-name-${index + 1}`} name={`element-name-${index + 1}`} value={colorElement.name} />
+                        <input type="hidden" id={`element-code-${index + 1}`} name={`element-code-${index + 1}`} value={colorElement.code} />
                       </div>
-                      <input type="hidden" id="element-name-1" name="element-name-1" value="name" />
-                      <input type="hidden" id="element-code-1" name="element-code-1" value="code" />
-                    </div>
+                    ))}
                   </div>
 
                   <div id="template-element" className="flex setting-delete" style={{ display: "none" }}>
@@ -113,33 +147,9 @@ export const Setting = () => {
                     <input type="hidden" id="" name="" value="" />
                     <input type="hidden" id="" name="" value="" />
                   </div>
-                  <div className="text-center">
-                    <button type="button" className="btn btn-warning w-100 mb-2 mt-5 sky-submit sky-bg-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                      Save
-                    </button>
-                  </div>
+                  <SaveButton targetModal="exampleModal" />
                 </form>
-
-                {/* modal */}
-                <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
-                  <div className="modal-dialog modal-dialog-centered">
-                    <div className="modal-content">
-                      <div className="modal-header">
-                        <h5 className="modal-title" id="exampleModalLabel">
-                          登録しますか？
-                        </h5>
-                      </div>
-                      <div className="modal-footer">
-                        <button type="button" className="btn me-2" data-bs-dismiss="modal">
-                          キャンセル
-                        </button>
-                        <button type="button" className="btn btn-warning px-4" onClick={save_submit}>
-                          登録
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <Modal id="exampleModal" label="exampleModalLabel" title="登録しますか？" cansel="キャンセル" submit="登録" submitFun={save_submit} cancelButtonRef={cancelButtonRef} />
               </div>
             </div>
           </div>

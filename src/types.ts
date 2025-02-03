@@ -81,3 +81,9 @@ export const initialUserListData: UserListData = {
     },
   ],
 };
+
+export type EleResultData = {
+  id: string;
+  title: string;
+  code: string;
+};

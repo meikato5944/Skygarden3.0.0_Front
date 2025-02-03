@@ -10,7 +10,7 @@ export const UserListGrid: React.FC<UserListGrid> = ({ userListResults }) => {
   return (
     <>
       {userListResults.map((userListResult: any, index: number) => (
-        <ListCard index={index} isContent={false} mode={""} id={userListResult.id} title={""} url={""} updated={""} username={userListResult.name} />
+        <ListCard key={index} isContent={false} mode={""} id={userListResult.id} title={""} url={""} updated={""} username={userListResult.name} />
       ))}
     </>
   );

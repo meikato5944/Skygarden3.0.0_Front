@@ -1,4 +1,9 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
+import { Modal } from "../components/common/Modal";
+import { TextInput } from "../components/common/input/TextInput";
+import { SaveButton } from "../components/common/button/SaveButton";
+import { UserAdminSwitch } from "../components/user/UserAdminSwitch";
+import { UserIDLabal } from "../components/user/UserIDLabal";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -20,8 +25,9 @@ export const User = () => {
       if (!contentForm.checkValidity()) {
         cancelButtonRef.current?.click();
         setTimeout(() => {
+          //cancelButtonRef.current?.click()との関係で少し待機
           contentForm.reportValidity();
-        }, 700); //.click()との関係で少し待機する必要がある
+        }, 700);
       } else {
         contentForm.submit();
       }
@@ -30,7 +36,7 @@ export const User = () => {
       return;
     }
   };
-  //値取得
+
   useLayoutEffect(() => {
     const params = new URLSearchParams(window.location.search);
     let fetchId = params.get("id") || "";
@@ -38,6 +44,7 @@ export const User = () => {
     if (fetchId != "") {
       fetch(`${API_BASE_URL}/getuser?&id=${fetchId}`, {
         method: "GET",
+        credentials: "include",
         headers: {
           Accept: "application/json",
         },
@@ -62,63 +69,13 @@ export const User = () => {
           <h2 className="text-center mb-2">ユーザ管理画面</h2>
           <div className="sky-User-box">
             <form id="contentform" name="contentform" action="/webadmin/user_post" method="POST">
-              <div className="form-check form-switch mb-1 sky-User-adminSwitch">
-                <input className="form-check-input sky-input-switch" type="checkbox" role="switch" id="admin" name="admin" value="1" onChange={handleAdminToggle} checked={admin} />
-                <label className="form-check-label ms-2" htmlFor="admin">
-                  admin
-                </label>
-              </div>
-              <div className="mb-2 d-flex">
-                <label htmlFor="username" className="sky-form-label me-2">
-                  ID:
-                </label>
-                <p>{id != "" ? id : "新規"}</p>
-                <input type="hidden" name="id" value={id} />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="username" className="sky-form-label">
-                  Name:
-                </label>
-                <input type="text" className="form-control sky-input" name="name" value={name} placeholder="Enter your username" onChange={(e) => setName(e.target.value)} required />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="password" className="sky-form-label">
-                  Password
-                </label>
-                <input type="password" className="form-control sky-input" id="password" name="password" value={password} placeholder="Enter a new password" onChange={(e) => setPassword(e.target.value)} required />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="email" className="sky-form-label">
-                  Email Address
-                </label>
-                <input type="email" className="form-control sky-input" id="email" name="email" value={email} placeholder="Enter your email" onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div className="text-center">
-                <button type="button" className="btn btn-warning w-100 mb-2 mt-5 sky-submit sky-bg-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                  Save
-                </button>
-              </div>
-
-              {/* modal */}
-              <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered">
-                  <div className="modal-content">
-                    <div className="modal-header">
-                      <h5 className="modal-title" id="exampleModalLabel">
-                        登録しますか？
-                      </h5>
-                    </div>
-                    <div className="modal-footer">
-                      <button type="button" className="btn me-2" data-bs-dismiss="modal" ref={cancelButtonRef}>
-                        キャンセル
-                      </button>
-                      <button type="button" className="btn btn-warning px-4" onClick={doSubmit}>
-                        登録
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <UserAdminSwitch onChange={handleAdminToggle} admin={admin} />
+              <UserIDLabal id={id} />
+              <TextInput isLogin={false} id="username" label="Name:" type="text" name="name" value={name} setState={setName} placeholder="Enter your username" required={true} />
+              <TextInput isLogin={false} id="password" label="Password:" type="password" name="password" value={password} setState={setPassword} placeholder="Enter a new password" required={true} />
+              <TextInput isLogin={false} id="email" label="Email Address:" type="email" name="email" value={email} setState={setEmail} placeholder="Enter your email" required={true} />
+              <SaveButton targetModal="exampleModal" />
+              <Modal id="exampleModal" label="exampleModalLabel" title="登録しますか？" cansel="キャンセル" submit="登録" submitFun={doSubmit} cancelButtonRef={cancelButtonRef} />
             </form>
           </div>
         </section>

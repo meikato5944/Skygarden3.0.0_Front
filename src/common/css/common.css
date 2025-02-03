@@ -1,44 +1,11 @@
 :root {
   --sidebar-width: 250px;
-  /* 1. ver2.0までの色味 */
   --sky-black: #000000;
   --sky-yellow-1: #fff888;
   --sky-yellow-2: #fff100;
   --sky-yellow-3: #ffffe9;
   --sky-yellow-4: #eee102;
   --sky-yellow-5: #ffd700;
-
-  /* 2.くすみカラー */
-  /* クリームパウダー #fff7c9
-  キャンディーピンク  #f7c4d4
-  グルーレイク #c0e4f2 */
-  /* --sky-black: #7d7d79;
-  /* メインカラー 要素色  listentryとか*/
-  /* --sky-yellow-1: #c0e4f2; */
-  /* ベースカラー 背景色 */
-  /* --sky-yellow-2: #fff7c9; */
-  /* inputの中身とか */
-  /* --sky-yellow-3: #ffffe9; */
-  /* アクセントカラー  濃い目の色 previewボタンとか   */
-  /* --sky-yellow-4: #f7c4d4; */
-  /* inputの中身とか */
-  /* --sky-yellow-5: #ffd700; */
-
-  /* 3.クラフト風カラー */
-  /* クリア・クレイ #e1b985
-     ラベンダーイエロー #fdd23e
-     コバルトターコイズ #00a08d */
-  /* --sky-black: #413716; */
-  /* メインカラー 要素色  listentryとか*/
-  /* --sky-yellow-1: #fdd23e; */
-  /* ベースカラー 背景色 */
-  /* --sky-yellow-2: #e1b985; */
-  /* inputの中身とか */
-  /* --sky-yellow-3: #ffffe9; */
-  /* アクセントカラー  濃い目の色 previewボタンとか   */
-  /* --sky-yellow-4: #00a08d; */
-  /* inputの中身とか */
-  /* --sky-yellow-5: #ffd700; */
 }
 
 a {

@@ -1,5 +1,5 @@
 import React from "react";
-import newCreate from "../../common/image/plus-lg.svg";
+import newCreate from "../../../common/image/plus-lg.svg";
 
 export const NewCreateButton: React.FC<{ href: string }> = ({ href }) => {
   return (
