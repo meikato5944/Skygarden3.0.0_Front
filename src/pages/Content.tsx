@@ -32,7 +32,6 @@ export interface ContentData {
 }
 
 export interface ElementListData {
-  pagerOutput: "";
   results: Array<{
     id: string;
     created: string;
@@ -65,7 +64,13 @@ export const Content = () => {
   const [elementcolor, setElementcolor] = useState("");
   const [templateOutput, setTemplateOutput] = useState("");
   const [colorOutput, setColorOutput] = useState("");
-  const [eleResults, setEleResults] = useState<EleResultData[]>([]);
+  const [eleResults, setEleResults] = useState<EleResultData[]>([
+    {
+      id: "",
+      title: "コンテンツ部分",
+      code: "",
+    },
+  ]);
   const [result, setResult] = useState<ContentData>({
     screenName: "",
     schedule_published: "",
@@ -82,10 +87,10 @@ export const Content = () => {
   });
   const elementItems = useRef<EleResultData[]>([]);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const deleteButtonRef = useRef<HTMLButtonElement>(null);
   const [isPublished, setIsPublished] = useState(true);
   let elementAddIndex = useRef(0);
   const [list, setList] = useState<ElementListData>({
-    pagerOutput: "",
     results: [
       {
         id: "",
@@ -143,6 +148,8 @@ export const Content = () => {
         .catch((error) => {
           console.error("Error fetching data:", error);
         });
+    } else if (fetchmode == "template" && !isFetched) {
+      setIsFetched(true);
     } else {
       if (fetchmode == "element") {
         fetch(`${API_BASE_URL}/getelement`, {
@@ -191,13 +198,79 @@ export const Content = () => {
     }
   };
 
-  const doSubmit = () => {
-    const contentForm = document.forms.namedItem("contentform") as HTMLFormElement;
-    if (contentForm) {
-      contentForm.submit();
+  const doSubmit = async () => {
+    if (await validate()) {
+      const contentForm = document.forms.namedItem("contentform") as HTMLFormElement;
+      if (contentForm) {
+        contentForm.submit();
+      } else {
+        console.error("Form with name 'contentform' not found");
+        return;
+      }
     } else {
-      console.error("Form with name 'contentform' not found");
-      return;
+      cancelButtonRef.current?.click();
+    }
+  };
+
+  const validate = async () => {
+    const forbiddenChars = /[\s<>#%{}`\\^\[\]'""]/;
+    let validateFlg = true;
+    const errorElements = document.getElementsByClassName("errorMessage");
+
+    while (errorElements.length > 0) {
+      errorElements[0].remove();
+    }
+    if (schedule_published !== "" && !isValidDateTimeFormat(schedule_published)) {
+      $("#schedule_published").addClass("is-invalid");
+      validateFlg = false;
+    }
+    if (schedule_unpublished !== "" && !isValidDateTimeFormat(schedule_unpublished)) {
+      $("#schedule_unpublished").addClass("is-invalid");
+      validateFlg = false;
+    }
+    if (url.startsWith("/") || url.endsWith("/")) {
+      $("#url").addClass("is-invalid");
+      validateFlg = false;
+    } else if (forbiddenChars.test(url)) {
+      $("#url").addClass("is-invalid");
+      validateFlg = false;
+    } else if (url != "") {
+      const urlExists = await isValidUrlMatch(url, id); // 非同期でチェックを待つ
+      if (urlExists) {
+        const newElement = document.createElement("div");
+        newElement.textContent = "そのurlはすでに使われています";
+        newElement.classList.add("ms-2");
+        newElement.classList.add("errorMessage");
+        newElement.style.color = "red";
+        $(newElement).insertAfter("#url");
+        validateFlg = false;
+      }
+    }
+    return validateFlg;
+  };
+
+  const isValidDateTimeFormat = (dateTimeString: string) => {
+    const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$/;
+    if (!regex.test(dateTimeString)) return false;
+
+    const [datePart, timePart] = dateTimeString.split(" ");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hour, minute] = timePart.split(":").map(Number);
+    const date = new Date(year, month - 1, day, hour, minute);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day && date.getHours() === hour && date.getMinutes() === minute;
+  };
+
+  const isValidUrlMatch = async (url: string, myId: string) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/urlmatches?url=${url}&myId=${myId}`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await res.json();
+      return data || false; // サーバーからのレスポンスを返す
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return false;
     }
   };
 
@@ -284,14 +357,20 @@ export const Content = () => {
   };
 
   //削除ボタン
-  const eleDelete = (event: React.MouseEvent<HTMLDivElement>) => {
+  const eleDelete = (event: React.MouseEvent<HTMLDivElement | HTMLButtonElement>) => {
     const indexStr = event.currentTarget.parentElement?.parentElement?.id;
     const indexId = event.currentTarget.parentElement?.parentElement?.getAttribute("data-element-id");
     if (indexStr && indexId && indexId != "content" && indexId != "") {
-      const index = parseInt(indexStr.replace("element-", ""), 10);
-      $("#element-" + index).remove();
-      createElementItems();
+      const indexToRemove = parseInt(indexStr.replace("element-", ""), 10);
+      setEleResults((prev) => prev.filter((_, index) => index !== indexToRemove));
+      elementItems.current.splice(indexToRemove, 1);
     }
+  };
+
+  //キャンセル時削除
+  const eleCancelDelete = () => {
+    setEleResults((prev) => prev.slice(0, -1)); // 最後の要素を削除
+    elementItems.current.splice(-1, 1);
   };
 
   //構成要素追加
@@ -309,7 +388,7 @@ export const Content = () => {
 
   // elementSelectModal----------------------------------------------------------------------------------------------
   useEffect(() => {
-    fetch(`${API_BASE_URL}/getElementItem?page=1`, {
+    fetch(`${API_BASE_URL}/getElementItem`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -385,7 +464,7 @@ export const Content = () => {
                         {/* published */}
                         <ContentScheduleInput id="schedule_published" label="start" name="schedule_published" value={schedule_published} setState={setSchedule_published} placeholder="Enter start" required={true} />
                         {/* unpublished */}
-                        <ContentScheduleInput id="schedule_unpublished" label="end" name="schedule_unpublished" value={schedule_unpublished} setState={setSchedule_unpublished} placeholder="Enter end" required={true} />
+                        <ContentScheduleInput id="schedule_unpublished" label="end" name="schedule_unpublished" value={schedule_unpublished} setState={setSchedule_unpublished} placeholder="Enter end" required={false} />
                       </div>
                       <div className="d-flex justify-content-center">
                         {/* publish */}
@@ -393,15 +472,19 @@ export const Content = () => {
                         {/* preview */}
                         <ContentPreviewButton onClick={preview} />
                         {/* delete */}
-                        <ContentDeleteButton mode={mode} />
+                        {id != "" && <ContentDeleteButton mode={mode} />}
                       </div>
                     </div>
                   </>
                 ) : (
                   <>
                     {/* delete */}
-                    <ContentDeleteButton mode={mode} />
-                    <input type="hidden" id="published" name="published" value="1" />
+                    {id != "" && (
+                      <>
+                        <ContentDeleteButton mode={mode} />
+                        <input type="hidden" id="published" name="published" value="1" />
+                      </>
+                    )}
                   </>
                 )}
                 {/* template select */}
@@ -409,23 +492,23 @@ export const Content = () => {
                 {/* element select */}
                 {mode == "element" && <ContentSelect isTemplate={false} id="elementcolor" label="type" name="elementcolor" value={elementcolor} setState={setElementcolor} selectOutput={colorOutput} />}
                 {/* title */}
-                <TextInput isLogin={false} id="title" label="title" type="text" name="title" value={title} setState={setTitle} placeholder="Enter title" required={true} />
+                <TextInput isLogin={false} id="title" label="title" type="text" name="title" value={title} setState={setTitle} placeholder="Enter title" required={true} errorMessage="" />
                 {/* head */}
                 {mode == "" || mode == "template" ? <ContentTextarea id="head" isContent={false} label="head" name="head" value={head} setState={setHead} placeholder="Enter head" rows={10} /> : ""}
                 {/* content */}
                 {mode == "template" ? <ContentElementInput eleResults={eleResults} upButton={upButton} downButton={downButton} eleDelete={eleDelete} elementAdd={elementAdd} id={id} content={content} /> : <ContentTextarea id="content" isContent={true} label="content" name="content" value={content} setState={setContent} placeholder="Enter content" rows={10} />}
                 {/* url */}
-                {mode != "template" && <TextInput isLogin={false} id="url" label="url" type="text" name="url" value={url} setState={setUrl} placeholder="Enter url" required={true} />}
+                {mode != "template" && <TextInput isLogin={false} id="url" label="url" type="text" name="url" value={url} setState={setUrl} placeholder="Enter url" required={true} errorMessage="urlの入力に誤りがあります" />}
                 <SaveButton targetModal="exampleModal" />
                 <input type="hidden" name="id" value={id} />
                 <input type="hidden" name="type" value={mode} />
               </form>
               {/* element Select modal */}
-              {mode == "template" && <ElementSelectModal results={list.results} elementSelect={elementSelect} pagerOutput={list.pagerOutput} elementSelecedComp={elementSelecedComp} />}
+              {mode == "template" && <ElementSelectModal results={list.results} elementSelect={elementSelect} eleCancelDelete={eleCancelDelete} elementSelecedComp={elementSelecedComp} />}
               {/* submit */}
               <Modal id="exampleModal" label="exampleModalLabel" title="登録しますか？" cansel="キャンセル" submit="登録" submitFun={mode == "template" ? doSubmitTemp : doSubmit} cancelButtonRef={cancelButtonRef} />
               {/* delete*/}
-              <Modal id="deleteModal" label="deleteModalLabel" title="削除しますか？元には戻せません" cansel="キャンセル" submit="削除" submitFun={doDelete} cancelButtonRef={cancelButtonRef} />
+              <Modal id="deleteModal" label="deleteModalLabel" title="削除しますか？元には戻せません" cansel="キャンセル" submit="削除" submitFun={doDelete} cancelButtonRef={deleteButtonRef} />
               <form id="deleteform" name="deleteform" action={`${API_BASE_URL}/delete_post`} method="POST">
                 <input type="hidden" name="id" id="deleteId" value={id} />
                 <input type="hidden" name="mode" value={mode} />

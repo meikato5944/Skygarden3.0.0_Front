@@ -18,11 +18,11 @@ type Props = {
     template: string;
   }>;
   elementSelect: (index: number) => void;
-  pagerOutput: string;
+  eleCancelDelete: MouseEventHandler<HTMLButtonElement>;
   elementSelecedComp: MouseEventHandler<HTMLButtonElement>;
 };
 
-export const ElementSelectModal: React.FC<Props> = ({ results, elementSelect, pagerOutput, elementSelecedComp }) => {
+export const ElementSelectModal: React.FC<Props> = ({ results, elementSelect, eleCancelDelete, elementSelecedComp }) => {
   return (
     <>
       <div className="modal fade" id="element-selectModal" tabIndex={-1} aria-labelledby="element-selectModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -51,12 +51,9 @@ export const ElementSelectModal: React.FC<Props> = ({ results, elementSelect, pa
               ))}
               <input type="hidden" id="selected-index" value="" />
               <input type="hidden" id="selected-value" value="" />
-              <nav aria-label="Page navigation example">
-                <ul className="pagination justify-content-center align-items-center mt-5" dangerouslySetInnerHTML={{ __html: pagerOutput }}></ul>
-              </nav>
             </section>
             <div className="modal-footer d-flex justify-content-center align-items-center">
-              <button type="button" className="btn mx-5" data-bs-dismiss="modal">
+              <button type="button" className="btn mx-5" data-bs-dismiss="modal" onClick={eleCancelDelete}>
                 キャンセル
               </button>
               <button type="button" className="btn btn-warning px-4 mx-5" data-bs-dismiss="modal" onClick={elementSelecedComp}>

@@ -29,8 +29,8 @@ export const Login = () => {
             <div className="card-body text-center border border-2 border-warning rounded">
               <h2 className="my-2 mb-3">Login</h2>
               {errorMessage && <div style={{ color: "red" }}>{errorMessage}</div>}
-              <TextInput isLogin={true} id="id" label="ID:" type="id" name="name" value={name} setState={setName} placeholder="ID" required={true} />
-              <TextInput isLogin={true} id="password" label="Password:" type="password" name="password" value={password} setState={setPassword} placeholder="Password" required={true} />
+              <TextInput isLogin={true} id="id" label="ID:" type="id" name="name" value={name} setState={setName} placeholder="ID" required={true} errorMessage="" />
+              <TextInput isLogin={true} id="password" label="Password:" type="password" name="password" value={password} setState={setPassword} placeholder="Password" required={true} errorMessage="" />
               <button type="submit" className="btn btn-warning w-100 mt-2 sky-bg-2">
                 Go
               </button>

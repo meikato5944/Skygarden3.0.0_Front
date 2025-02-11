@@ -16,7 +16,8 @@ export const ContentScheduleInput: React.FC<Props> = ({ id, label, name, value, 
       <label htmlFor={id} className="sky-form-label fw-bold ms-1 mb-1">
         {label}
       </label>
-      <input type="text" className="form-control border-warning sky-input datepicker" id={id} name={name} value={value} onChange={(e) => setState(e.target.value)} placeholder={placeholder} required={required} />
+      <input type="datetime-local" className="form-control border-warning sky-input" id={id} name={name} value={value} onChange={(e) => setState(e.target.value.replaceAll("/", "-").replaceAll("T", " "))} placeholder={placeholder} required={required} />
+      <div className="invalid-feedback">日時形式で入力してください</div>
     </div>
   );
 };
