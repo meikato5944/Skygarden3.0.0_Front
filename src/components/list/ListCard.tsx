@@ -15,7 +15,7 @@ export const ListCard: React.FC<ListCard> = ({ key, isContent, mode, id, title, 
   return (
     <>
       {isContent ? (
-        <a href={`/content/?mode=${mode}&id=${id}`} key={key}>
+        <a href={`/content?mode=${mode}&id=${id}`} key={key}>
           <div className="sky-list-card">
             <p className="mb-0">ID: {id}</p>
             <h3 className="mb-1">{title}</h3>
