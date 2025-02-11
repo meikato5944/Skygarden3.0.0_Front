@@ -6,9 +6,13 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 export const Header = () => {
   const [username, setUserName] = useState("");
+  const [admin, setAdmin] = useState("");
   useEffect(() => {
     getSessionData("name").then((data: string) => {
       setUserName(data);
+    });
+    getSessionData("admin").then((data: string) => {
+      setAdmin(data);
     });
   }, []);
 
@@ -64,11 +68,13 @@ export const Header = () => {
                 　Movie
               </a>
             </li>
-            <li className="nav-item ms-3">
-              <a className="nav-link" href="/user-list">
-                Users
-              </a>
-            </li>
+            {admin == "1" && (
+              <li className="nav-item ms-3">
+                <a className="nav-link" href="/user-list">
+                  Users
+                </a>
+              </li>
+            )}
             <li className="nav-item ms-3">
               <a className="nav-link" href="/setting">
                 Settings
@@ -144,11 +150,13 @@ export const Header = () => {
                 　Movie
               </a>
             </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/user-list">
-                Users
-              </a>
-            </li>
+            {admin == "1" && (
+              <li className="nav-item">
+                <a className="nav-link" href="/user-list">
+                  Users
+                </a>
+              </li>
+            )}
             <li className="nav-item">
               <a className="nav-link" href="/setting">
                 Settings
