@@ -71,9 +71,9 @@ export const User = () => {
             <form id="contentform" name="contentform" action="/webadmin/user_post" method="POST">
               <UserAdminSwitch onChange={handleAdminToggle} admin={admin} />
               <UserIDLabal id={id} />
-              <TextInput isLogin={false} id="username" label="Name:" type="text" name="name" value={name} setState={setName} placeholder="Enter your username" required={true} />
-              <TextInput isLogin={false} id="password" label="Password:" type="password" name="password" value={password} setState={setPassword} placeholder="Enter a new password" required={true} />
-              <TextInput isLogin={false} id="email" label="Email Address:" type="email" name="email" value={email} setState={setEmail} placeholder="Enter your email" required={true} />
+              <TextInput isLogin={false} id="username" label="Name:" type="text" name="name" value={name} setState={setName} placeholder="Enter your username" required={true} errorMessage="" />
+              <TextInput isLogin={false} id="password" label="Password:" type="password" name="password" value={password} setState={setPassword} placeholder="Enter a new password" required={true} errorMessage="" />
+              <TextInput isLogin={false} id="email" label="Email Address:" type="email" name="email" value={email} setState={setEmail} placeholder="Enter your email" required={true} errorMessage="" />
               <SaveButton targetModal="exampleModal" />
               <Modal id="exampleModal" label="exampleModalLabel" title="登録しますか？" cansel="キャンセル" submit="登録" submitFun={doSubmit} cancelButtonRef={cancelButtonRef} />
             </form>

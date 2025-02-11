@@ -22,8 +22,8 @@ export const ContentElementInput: React.FC<Props> = ({ eleResults, upButton, dow
         </label>
         <div className="form-control border-warning" id="elements" data-name="content">
           {eleResults.map((eleResult, index: number) =>
-            eleResult.id == null || eleResult.id == "content" ? (
-              <div className="sky-Content-element-card justify-content-between" id={`element-${index}`} data-name="element-content" data-element-id="content" data-element-title="" data-element-code="">
+            eleResult.id == null || eleResult.id == "" || eleResult.id == "content" ? (
+              <div className="sky-Content-element-card justify-content-between" key={eleResult.id} id={`element-${index}`} data-name="element-content" data-element-id="content" data-element-title="" data-element-code="">
                 <div>
                   <div className="btn btn-warning mx-1 sky-Content-element-arrow" onClick={upButton}>
                     ▲
@@ -40,7 +40,7 @@ export const ContentElementInput: React.FC<Props> = ({ eleResults, upButton, dow
                 </div>
               </div>
             ) : (
-              <div className="sky-Content-element-card justify-content-between" id={`element-${index}`} data-name="element-content" data-element-id={eleResult.id} data-element-title={eleResult.title} data-element-code={eleResult.code} style={{ backgroundColor: eleResult.code }}>
+              <div className="sky-Content-element-card justify-content-between" key={eleResult.id} id={`element-${index}`} data-name="element-content" data-element-id={eleResult.id} data-element-title={eleResult.title} data-element-code={eleResult.code} style={{ backgroundColor: eleResult.code }}>
                 <div>
                   <div className="btn btn-warning mx-1 sky-Content-element-arrow" onClick={upButton}>
                     ▲
@@ -68,8 +68,6 @@ export const ContentElementInput: React.FC<Props> = ({ eleResults, upButton, dow
           </a>
         </div>
       </div>
-      <input type="hidden" name="id" value={id} />
-      <input type="hidden" name="type" value="template" />
       <input type="hidden" name="content" id="content" value={content} />
     </>
   );
