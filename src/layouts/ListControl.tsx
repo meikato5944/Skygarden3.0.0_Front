@@ -13,9 +13,9 @@ export const ListControl: React.FC<ListControlData> = ({ screenName, sortOutput,
   return (
     <>
       <h1 className="ms-1 mb-3">{screenName}一覧</h1>
+      {registerMessage ? <div>registerMessage</div> : ""}
       <div className="row">
         <Sort sortOutput={sortOutput} />
-        {registerMessage ? <div>registerMessage</div> : ""}
         <NewCreateButton href={href} />
       </div>
     </>
